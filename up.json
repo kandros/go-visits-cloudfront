@@ -1,0 +1,19 @@
+{
+  "name": "visits",
+  "stages": {
+    "development": {
+      "proxy": {
+        "command": "gin --port $PORT"
+      }
+    }
+  },
+  "lambda": {
+    "policy": [
+      {
+        "Effect": "Allow",
+        "Resource": "*",
+        "Action": ["dynamodb:Get*", "dynamodb:List*", "dynamodb:PutItem", "dynamodb:DeleteItem"]
+      }
+    ]
+  }
+}
