@@ -51,7 +51,7 @@ func NewFromRequest(r *http.Request) Visit {
 		Hostname:  b.Hostname,
 		VisitID:   b.VisitID,
 		DeviceID:  b.DeviceID,
-		URL:       "https://google.com",
+		URL:       b.Href,
 		Timestamp: timestamp,
 		IP:        ip,
 		CountryID: countryID,
