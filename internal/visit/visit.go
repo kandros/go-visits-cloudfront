@@ -1,17 +1,29 @@
 package visit
 
 import (
+	"encoding/json"
 	"net/http"
 	"strconv"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/kandros/visits/internal/dynamo"
 	"github.com/kandros/visits/internal/util"
 )
 
+type RequestBodyInput struct {
+	Href     string `json:"href"`
+	DeviceID string `json:"device_id"`
+	VisitID  string `json:"visit_id"`
+	Port     string `json:"port"`
+	Hostname string `json:"hostname"`
+}
+
 type Visit struct {
+	Href      string    `json:"href"`
+	DeviceID  string    `json:"device_id"`
 	VisitID   string    `json:"visit_id"`
+	UserAgent string    `json:"user_agent"`
+	Hostname  string    `json:"hostname"`
 	URL       string    `json:"url"`
 	Timestamp time.Time `json:"timestamp"`
 	IP        string    `json:"ip"`
@@ -22,13 +34,23 @@ type Visit struct {
 
 func NewFromRequest(r *http.Request) Visit {
 	ip, _ := util.MustGetIp(r.RemoteAddr)
+	decoder := json.NewDecoder(r.Body)
+	var b RequestBodyInput
+	err := decoder.Decode(&b)
+	if err != nil {
+		panic(err)
+	}
 
-	visitID := uuid.New().String()
 	timestamp := time.Now()
+	userAgent := getUserAgent(r.Header)
 	countryID, isMobile, isTablet := getCloudFrontHeaders(r.Header)
 
 	return Visit{
-		VisitID:   visitID,
+		UserAgent: userAgent,
+		Href:      b.Href,
+		Hostname:  b.Hostname,
+		VisitID:   b.VisitID,
+		DeviceID:  b.DeviceID,
 		URL:       "https://google.com",
 		Timestamp: timestamp,
 		IP:        ip,
@@ -45,6 +67,12 @@ func (v Visit) Persist() error {
 	}
 
 	return nil
+}
+
+func getUserAgent(headers http.Header) (useragent string) {
+	if v, ok := headers["User-Agent"]; ok && len(v) > 0 {
+		useragent = v[0]
+	}
 }
 
 func getCloudFrontHeaders(headers http.Header) (countryID string, isMobile, isTablet bool) {

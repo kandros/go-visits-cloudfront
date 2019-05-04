@@ -14,6 +14,10 @@ import (
 func main() {
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// logRequestHeaders(r)
+		setupResponse(&w)
+		if (r).Method == "OPTIONS" {
+			return
+		}
 		v := visit.NewFromRequest(r)
 
 		if err := v.Persist(); err != nil {
@@ -35,4 +39,10 @@ func logRequestHeaders(r *http.Request) {
 	apexlog.WithFields(apexlog.Fields{
 		"headers": r.Header,
 	}).Info("xxx")
+}
+
+func setupResponse(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+	(*w).Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
+	(*w).Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
 }
