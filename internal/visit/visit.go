@@ -73,6 +73,7 @@ func getUserAgent(headers http.Header) (useragent string) {
 	if v, ok := headers["User-Agent"]; ok && len(v) > 0 {
 		useragent = v[0]
 	}
+	return
 }
 
 func getCloudFrontHeaders(headers http.Header) (countryID string, isMobile, isTablet bool) {
