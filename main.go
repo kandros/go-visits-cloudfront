@@ -18,6 +18,10 @@ func main() {
 		if (r).Method == "OPTIONS" {
 			return
 		}
+		if (r).Method != "POST" {
+			w.Write([]byte("only POST allowed"))
+			return
+		}
 		v := visit.NewFromRequest(r)
 
 		if err := v.Persist(); err != nil {
