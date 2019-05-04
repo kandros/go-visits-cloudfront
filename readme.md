@@ -1,4 +1,6 @@
-save requests informations from api-gaterayt to dynamodb
+## go-visits-cloundfront
+
+a lambda that saves requests informations from api-gaterayt to dynamodb
 
 it extract there headers from cloudfront request
 
